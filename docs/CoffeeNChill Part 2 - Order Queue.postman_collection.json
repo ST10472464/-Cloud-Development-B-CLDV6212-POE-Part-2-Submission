@@ -1,0 +1,246 @@
+{
+  "info": {
+    "name": "CoffeeNChill API - Part 2 Order Queue Collection",
+    "_postman_id": "coffeennchill-part2-orders",
+    "description": "Postman collection covering the CoffeeNChill order queue producer (Part 2, Team Member 1). Uses {{baseUrl}} so it works in any environment.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:7058"
+    }
+  ],
+  "item": [
+    {
+      "name": "Order Queue Operations",
+      "item": [
+        {
+          "name": "Queue Order (Jane Smith)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Order was queued successfully', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.message).to.include('queued');",
+                  "    pm.expect(json.orderId).to.eql('ORD-2026-8801');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/queue",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "queue"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"OrderId\": \"ORD-2026-8801\",\n  \"CustomerName\": \"Jane Smith\",\n  \"SelectedItemSKUs\": [\"COF-001\", \"PAS-104\"],\n  \"TotalPrice\": 65.00,\n  \"OrderTimestamp\": \"2026-10-12T10:15:00Z\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Queue Second Order (John Doe)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Order was queued successfully', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.message).to.include('queued');",
+                  "    pm.expect(json.orderId).to.eql('ORD-2026-8802');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/queue",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "queue"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"OrderId\": \"ORD-2026-8802\",\n  \"CustomerName\": \"John Doe\",\n  \"SelectedItemSKUs\": [\"COL-001\"],\n  \"TotalPrice\": 35.00,\n  \"OrderTimestamp\": \"2026-10-12T10:20:00Z\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Queue Order Without Timestamp (server generates)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Order was queued successfully', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.message).to.include('queued');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/queue",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "queue"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"OrderId\": \"ORD-2026-8803\",\n  \"CustomerName\": \"Alice Johnson\",\n  \"SelectedItemSKUs\": [\"COF-002\", \"COL-001\", \"PAS-104\"],\n  \"TotalPrice\": 88.50\n}"
+            }
+          }
+        },
+        {
+          "name": "Queue Invalid Order (missing SKUs -> 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Validation message returned', function () {",
+                  "    pm.expect(pm.response.text()).to.include('SKU');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/queue",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "queue"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"OrderId\": \"ORD-2026-8899\",\n  \"CustomerName\": \"Bob Brown\",\n  \"SelectedItemSKUs\": [],\n  \"TotalPrice\": 10.00\n}"
+            }
+          }
+        },
+        {
+          "name": "Queue Invalid Order (zero price -> 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Validation message returned', function () {",
+                  "    pm.expect(pm.response.text()).to.include('TotalPrice');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/queue",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "queue"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"OrderId\": \"ORD-2026-8898\",\n  \"CustomerName\": \"Carol White\",\n  \"SelectedItemSKUs\": [\"COF-001\"],\n  \"TotalPrice\": 0\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Orders (verify processing)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Orders exist in the Orders table', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    pm.expect(json.length).to.be.above(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
