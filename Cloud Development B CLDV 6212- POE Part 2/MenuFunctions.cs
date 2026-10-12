@@ -185,14 +185,18 @@ namespace CoffeeNChill.Functions
 
             try
             {
-                await tableClient.DeleteEntityAsync(category, id);
+                // Fetch first so a missing item reliably returns 404 (Azurite does not throw
+                // on a direct conditional delete of an entity that does not exist).
+                var existingItem = await tableClient.GetEntityAsync<MenuItem>(category, id);
+                await tableClient.DeleteEntityAsync(existingItem.Value.PartitionKey, existingItem.Value.RowKey, existingItem.Value.ETag);
+
                 _logger.LogInformation("Deleted menu item {Id} in category {Category}.", id, category);
 
                 var response = req.CreateResponse(HttpStatusCode.OK);
                 await response.WriteStringAsync($"Menu item '{id}' deleted successfully.");
                 return response;
             }
-            catch (RequestFailedException)
+            catch (RequestFailedException ex) when (ex.Status == 404)
             {
                 _logger.LogWarning("Menu item {Id} not found in category {Category} during delete.", id, category);
                 return await NotFoundAsync(req, $"Menu item with category '{category}' and ID '{id}' not found.");
