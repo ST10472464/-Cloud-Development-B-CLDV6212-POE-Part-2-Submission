@@ -4,3 +4,4 @@ appsettings.json
 user secrets
 .vs/
 *.user
+func.log
