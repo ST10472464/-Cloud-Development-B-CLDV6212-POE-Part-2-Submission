@@ -125,7 +125,7 @@ Ports: `10000` Tables, `10001` Blobs, `10002` Queues.
 ### 4. Run the Functions locally
 
 ```bash
-cd "Cloud Development B CLDV 6212- POE Part 1"
+cd "Cloud Development B CLDV 6212- POE Part 2"
 func start
 ```
 
